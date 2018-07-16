@@ -133,7 +133,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     keep_prob_stat = 0.6
     learning_rate_stat = 0.005
     for epoch in range(epochs):
-        learning_rate_degrade = learning_rate_stat * 0.95 ** ( i / 1.0)
+        learning_rate_degrade = learning_rate_stat * 0.95 ** ( epoch/ 1.0)
         for image, label in get_batches_fn(batch_size):
             _, loss = sess.run([train_op, cross_entropy_loss],
                                feed_dict={input_image: image,
