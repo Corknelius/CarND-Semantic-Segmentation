@@ -61,26 +61,25 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     vgg_layer4_out = tf.stop_gradient(vgg_layer4_out)
     vgg_layer7_out = tf.stop_gradient(vgg_layer7_out)
     
-    
-    conv_1x1 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, padding = 'same',
+    conv_1x1 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, strides = (1,1), padding = 'same',
                                               kernel_regularizer = tf.contrib.layers.l2_regularizer(1e-3))
     
-    output = tf.layers.conv2d_transpose(conv_1x1, num_classes, 4, 2, padding = 'same',
+    output = tf.layers.conv2d_transpose(conv_1x1, num_classes, 4,  strides = (2,2), padding = 'same',
                                                          kernel_regularizer = tf.contrib.layers.l2_regularizer(1e-3))
                                                          
     
-    skip_layer_1 = tf.layers.conv2d(vgg_layer4_out, num_classes, 4,2, padding = 'same',
+    skip_layer_1 = tf.layers.conv2d(vgg_layer4_out, num_classes, 1, strides = (1,1), padding = 'same',
                                                    kernel_regularizer = tf.contrib.layers.l2_regularizer(1e-3))
     skip_conn_1 = tf.add(output, skip_layer_1)
     
-    output_2 = tf.layers.conv2d_transpose(skip_conn_1, num_classes, 4, 2, padding = 'same',
+    output_2 = tf.layers.conv2d_transpose(skip_conn_1, num_classes, 4,  strides = (2,2), padding = 'same',
                                                              kernel_regularizer = tf.contrib.layers.l2_regularizer(1e-3))
     
-    skip_layer_2 = tf.layers.conv2d(skip_conn_1, num_classes, 4,2, padding = 'same',
+    skip_layer_2 = tf.layers.conv2d(skip_conn_1, num_classes, 1, strides = (1,1), padding = 'same',
                                                    kernel_regularizer = tf.contrib.layers.l2_regularizer(1e-3))
     skip_conn_2 = tf.add(output_2, skip_layer_1)
     
-    output_3 = tf.layers.conv2d_transpose(skip_conn_2, num_classes, 16, 8, padding = 'same',
+    output_3 = tf.layers.conv2d_transpose(skip_conn_2, num_classes, 16,  strides = (8,8), padding = 'same',
                                                              kernel_regularizer = tf.contrib.layers.l2_regularizer(1e-3))
     
     return output_3
@@ -148,7 +147,7 @@ def run():
     runs_dir = './runs'
     tests.test_for_kitti_dataset(data_dir)
     epochs = 20
-    batch_size = 2
+    batch_size = 8
 
     # Download pretrained vgg model
     helper.maybe_download_pretrained_vgg(data_dir)
@@ -182,13 +181,14 @@ def run():
         
         print("Running Session")
         sess.run(tf.global_variables_initializer())
-        print("Session Ran")
+        print("Beginning Training")
         train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, input_image, correct_label, keep_prob, learning_rate)
 
         # TODO: Save inference data using helper.save_inference_samples
         
+        print("Saving Inference Samples...")
         helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image, epochs)
-        
+        print("Finished!")
         #  helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
 
         # OPTIONAL: Apply the trained model to a video
