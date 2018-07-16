@@ -70,7 +70,7 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
                                                          kernel_regularizer = tf.contrib.layers.l2_regularizer(1e-3))
                                                          
     # FC2
-    scaled_4 = tf.multiple(vgg_layer4_out, 0.01)
+    scaled_4 = tf.multiply(vgg_layer4_out, 0.01)
     conv_1x1_layer4 = tf.layers.conv2d(scaled_4, num_classes, 1, strides = (1,1), padding = 'same',
                                                    kernel_regularizer = tf.contrib.layers.l2_regularizer(1e-3))
     skip_conn_1 = tf.add(FC_1, conv_1x1_layer4)
@@ -79,7 +79,7 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
                                                              kernel_regularizer = tf.contrib.layers.l2_regularizer(1e-3))
     
     # FC3
-    scaled_3 = tf.multiple(vgg_layer3_out, 0.0001)
+    scaled_3 = tf.multiply(vgg_layer3_out, 0.0001)
     conv_1x1_layer3 = tf.layers.conv2d(scaled_3, num_classes, 1, strides = (1,1), padding = 'same',
                                                    kernel_regularizer = tf.contrib.layers.l2_regularizer(1e-3))
     skip_conn_2 = tf.add(FC_2, conv_1x1_layer3)
